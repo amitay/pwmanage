@@ -1,0 +1,16 @@
+Password Manager
+
+pwmanage is a password manager developed using talloc/tdb. 
+
+pwmanage is a commandline tool to manage your passwords/secrets. The database
+is stored in tdb format. Each password is stored against a key which is 
+used to search in the database. 
+
+Usage:
+
+   pwmanage init        - Initialize the database (file ~/.pwmanage.tdb)
+   pwmanage add <key>   - Add a key to the database
+   pwmanage edit <key>  - Edit existing key
+   pwmanage del <key>   - Delete existing key
+   pwmanage list        - List all the keys
+   pwmanage <key>       - Dump the secret stored against the key
