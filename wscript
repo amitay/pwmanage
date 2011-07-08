@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 APPNAME = 'pwmanage'
-VERSION = '0.1'
+VERSION = '0.2'
 
 top = '.'
 out = 'build'

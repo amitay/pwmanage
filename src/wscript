@@ -5,7 +5,7 @@ def build(ctx):
 	ctx.program(source='pwmanage.c', 
 			target='pwmanage', 
 			includes='..',
-			lib=['tdb', 'crypt'],
+			lib=['tdb', 'talloc', 'crypt'],
 			cflags = ['-g', '-Wall'],
 			install_path = '${PREFIX}/bin'
 			)
