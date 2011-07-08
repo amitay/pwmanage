@@ -206,7 +206,8 @@ pw_user_edit(struct pw_context *ctx, TDB_DATA *data)
 	/* invoke editor */
 	editor = getenv("EDITOR");
 	if(editor == NULL) {
-		editor = strdup("/bin/vi");
+		fprintf(stderr, "%s: Variable EDITOR not defined.\n", ctx->progname);
+		return -1;
 	}
 	cmd = talloc_zero_size(ctx, strlen(editor) + strlen(tmppath) + 2);
 	cmd = talloc_asprintf(ctx, "%s %s", editor, tmppath);
