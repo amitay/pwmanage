@@ -8,9 +8,10 @@ used to search in the database.
 
 Usage:
 
-   pwmanage init        - Initialize the database (file ~/.pwmanage.tdb)
-   pwmanage add <key>   - Add a key to the database
-   pwmanage edit <key>  - Edit existing key
-   pwmanage del <key>   - Delete existing key
-   pwmanage list        - List all the keys
-   pwmanage <key>       - Dump the secret stored against the key
+   pwmanage init              - Initialize the database (file ~/.pwmanage.tdb)
+   pwmanage add <key>         - Add a new record to the database
+   pwmanage edit <key>        - Edit an existing record
+   pwmanage del <key>         - Delete an existing record
+   pwmanage move <key> <key2> - Rename key for a record to key2
+   pwmanage list              - List all the keys
+   pwmanage <key>             - Dump the secret stored against the key
