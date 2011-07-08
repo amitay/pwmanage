@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+def build(ctx):
+	ctx.program(source='pwmanage.c', 
+			target='pwmanage', 
+			includes='..',
+			lib=['tdb', 'crypt'],
+			cflags = ['-g', '-Wall'],
+			install_path = '${PREFIX}/bin'
+			)
