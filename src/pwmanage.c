@@ -206,7 +206,8 @@ pw_user_edit(struct pw_context *ctx, TDB_DATA *data)
 	/* invoke editor */
 	editor = getenv("EDITOR");
 	if(editor == NULL) {
-		fprintf(stderr, "%s: Variable EDITOR not defined.\n", ctx->progname);
+		fprintf(stderr, "%s: Variable EDITOR not defined.\n", 
+				ctx->progname);
 		return -1;
 	}
 	cmd = talloc_zero_size(ctx, strlen(editor) + strlen(tmppath) + 2);
@@ -435,7 +436,9 @@ pw_add(struct pw_context *ctx, TDB_DATA key)
 
 	secret.dptr = 0;
 	secret.dsize = 0;
-	pw_user_edit(ctx, &secret);
+	if(pw_user_edit(ctx, &secret) < 0) {
+		return -1;
+	}
 
 	if(pw_encode(key, secret, &enc_secret, NULL) < 0) {
 		return -1;
