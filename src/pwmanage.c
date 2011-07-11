@@ -121,7 +121,7 @@ pw_init(struct pw_context *ctx)
 	char *path;
 
 	path = pw_get_filepath(ctx);
-	ctx->tdb = tdb_open(path, 0, TDB_CLEAR_IF_FIRST, 
+	ctx->tdb = tdb_open(path, 0, TDB_CLEAR_IF_FIRST,
 				O_RDWR|O_CREAT|O_EXCL, 0600);
 	if(ctx->tdb == NULL) {
 		fprintf(stderr, "%s: Error creating database.\n", ctx->progname);
@@ -186,7 +186,7 @@ pw_list(struct pw_context *ctx)
 
 
 /*
- * Allow user to edit the secret using /bin/vi or editor defined in 
+ * Allow user to edit the secret using /bin/vi or editor defined in
  * EDITOR environmental variable
  *
  * TODO: Need to check the return value from editor
@@ -206,7 +206,7 @@ pw_user_edit(struct pw_context *ctx, TDB_DATA *data)
 	tmppath = tmpnam(NULL);
 	fd = open(tmppath, O_CREAT|O_TRUNC|O_RDWR, 0600);
 	if(fd < 0) {
-		fprintf(stderr, "%s: Could not create temporary file.\n", 
+		fprintf(stderr, "%s: Could not create temporary file.\n",
 			ctx->progname);
 		exit(1);
 	}
@@ -218,7 +218,7 @@ pw_user_edit(struct pw_context *ctx, TDB_DATA *data)
 	/* invoke editor */
 	editor = getenv("EDITOR");
 	if(editor == NULL) {
-		fprintf(stderr, "%s: Variable EDITOR not defined.\n", 
+		fprintf(stderr, "%s: Variable EDITOR not defined.\n",
 				ctx->progname);
 		return -1;
 	}
@@ -285,9 +285,9 @@ pw_getpass(char confirm)
 
 /*
  * Encryption / Decryption of using CBC
- * 
+ *
  * Maximum password length = 16
- * First (up to) 8 characters are copied as key 
+ * First (up to) 8 characters are copied as key
  * Remaining (up to) 8 characters are copied as mode
  * If password is smaller than 8 chars, is padded with numbers
  */
@@ -352,7 +352,7 @@ pw_encode(TDB_DATA key, TDB_DATA secret, TDB_DATA *enc_secret, char *pass)
 	encdata->len = secret.dsize;
 
 	/* actual secret data */
-	memcpy((void *)(data.dptr + sizeof(struct pw_encdata)), 
+	memcpy((void *)(data.dptr + sizeof(struct pw_encdata)),
 		secret.dptr, secret.dsize);	
 
 	if(pass == NULL) {
@@ -373,7 +373,7 @@ pw_encode(TDB_DATA key, TDB_DATA secret, TDB_DATA *enc_secret, char *pass)
 	header = (struct pw_header *)enc_secret->dptr;
 	header->mtime = time(NULL);
 
-	memcpy((void *)(enc_secret->dptr + sizeof(struct pw_header)), 
+	memcpy((void *)(enc_secret->dptr + sizeof(struct pw_header)),
 		data.dptr, data.dsize);
 
 	TALLOC_FREE(data.dptr);
@@ -400,8 +400,8 @@ pw_decode(TDB_DATA key, TDB_DATA enc_secret, TDB_DATA *secret, char **pass)
 	data.dptr = talloc_zero_size(NULL, data.dsize);
 
 	while(!done && tries < 3) {
-		memcpy((void *)data.dptr, 
-			(void *)(enc_secret.dptr + sizeof(struct pw_header)), 
+		memcpy((void *)data.dptr,
+			(void *)(enc_secret.dptr + sizeof(struct pw_header)),
 			data.dsize);
 
 		skey = pw_getpass(0);
@@ -412,7 +412,7 @@ pw_decode(TDB_DATA key, TDB_DATA enc_secret, TDB_DATA *secret, char **pass)
 			secret->dsize = encdata->len;
 			secret->dptr = talloc_zero_size(NULL, secret->dsize);
 
-			memcpy((void *)secret->dptr, 
+			memcpy((void *)secret->dptr,
 				(void *)(data.dptr + sizeof(struct pw_encdata)),
 				secret->dsize);
 
@@ -457,7 +457,7 @@ pw_add(struct pw_context *ctx, TDB_DATA key)
 	}
 
 	if(tdb_store(ctx->tdb, key, enc_secret, TDB_INSERT) < 0) {
-		fprintf(stderr, "%s: %s\n", ctx->progname, 
+		fprintf(stderr, "%s: %s\n", ctx->progname,
 				tdb_errorstr(ctx->tdb));
 		return -1;
 	}
@@ -478,7 +478,7 @@ pw_del(struct pw_context *ctx, TDB_DATA key)
 	response = getchar();
 	if(response == (int)'y' || response == (int)'Y') {
 		if(tdb_delete(ctx->tdb, key) < 0) {
-			fprintf(stderr, "%s: %s\n", ctx->progname, 
+			fprintf(stderr, "%s: %s\n", ctx->progname,
 				tdb_errorstr(ctx->tdb));
 			return -1;
 		}
@@ -512,7 +512,7 @@ pw_edit(struct pw_context *ctx, TDB_DATA key)
 	}
 
 	if(tdb_store(ctx->tdb, key, enc_secret, TDB_REPLACE) < 0) {
-		fprintf(stderr, "%s: %s\n", ctx->progname, 
+		fprintf(stderr, "%s: %s\n", ctx->progname,
 				tdb_errorstr(ctx->tdb));
 		return -1;
 	}
@@ -549,7 +549,7 @@ pw_search(struct pw_context *ctx, TDB_DATA key)
 
 
 /*
- * Rename the key in database 
+ * Rename the key in database
  */
 int
 pw_rename(struct pw_context *ctx, TDB_DATA key, TDB_DATA key2)
@@ -571,21 +571,21 @@ pw_rename(struct pw_context *ctx, TDB_DATA key, TDB_DATA key2)
 	}
 
 	if(tdb_store(ctx->tdb, key2, enc_secret, TDB_INSERT) < 0) {
-		fprintf(stderr, "%s: %s\n", ctx->progname, 
+		fprintf(stderr, "%s: %s\n", ctx->progname,
 				tdb_errorstr(ctx->tdb));
 		tdb_transaction_cancel(ctx->tdb);
 		return -1;
 	}
 
 	if(tdb_delete(ctx->tdb, key) < 0) {
-		fprintf(stderr, "%s: %s\n", ctx->progname, 
+		fprintf(stderr, "%s: %s\n", ctx->progname,
 				tdb_errorstr(ctx->tdb));
 		tdb_transaction_cancel(ctx->tdb);
 		return -1;
 	}
 		
 	if(tdb_transaction_commit(ctx->tdb) < 0) {
-		fprintf(stderr, "%s: %s\n", ctx->progname, 
+		fprintf(stderr, "%s: %s\n", ctx->progname,
 				tdb_errorstr(ctx->tdb));
 		return -1;
 	}
@@ -645,7 +645,7 @@ main(int argc, char *argv[])
 	if(argc >= 3) {
 		pattern = argv[2];
 		if(strlen(pattern) < 3) {
-			fprintf(stderr, "%s: Key (%s) too small\n", 
+			fprintf(stderr, "%s: Key (%s) too small\n",
 				ctx->progname, pattern);
 			retval = 1;
 			goto end;
@@ -655,7 +655,7 @@ main(int argc, char *argv[])
 	if(argc >= 4) {
 		pattern2 = argv[3];
 		if(strlen(pattern2) < 3) {
-			fprintf(stderr, "%s: Key (%s) too small\n", 
+			fprintf(stderr, "%s: Key (%s) too small\n",
 				ctx->progname, pattern2);
 			retval = 1;
 			goto end;
@@ -691,7 +691,7 @@ main(int argc, char *argv[])
 
 	if(action == PW_ADD) {
 		if(key_exists) {
-			fprintf(stderr, "%s: Key (%s) already exists.\n", 
+			fprintf(stderr, "%s: Key (%s) already exists.\n",
 				ctx->progname, pattern);
 			retval = 1;
 		} else {
