@@ -65,6 +65,18 @@ pw_usage(struct pw_context *ctx)
 
 
 /*
+ * Free TDB data memory
+ */
+void
+pw_tdb_free(TDB_DATA *data)
+{
+	if(data->dptr) {
+		free(data->dptr);
+	}
+	data->dsize = 0;
+}
+
+/*
  * Debug routine, dump string in hex
  */
 void
@@ -488,6 +500,8 @@ pw_edit(struct pw_context *ctx, TDB_DATA key)
 	if(pw_decode(key, enc_secret, &secret, &skey) < 0) {
 		return -1;
 	}
+	pw_tdb_free(&enc_secret);
+	
 
 	if(pw_user_edit(ctx, &secret) < 0) {
 		return -1;
@@ -521,6 +535,7 @@ pw_search(struct pw_context *ctx, TDB_DATA key)
 	if(pw_decode(key, enc_secret, &secret, NULL) < 0) {
 		return -1;
 	}
+	pw_tdb_free(&enc_secret);
 
 	str = talloc_strndup(NULL, (char *)secret.dptr, secret.dsize);
 
@@ -550,6 +565,7 @@ pw_rename(struct pw_context *ctx, TDB_DATA key, TDB_DATA key2)
 	if(pw_decode(key, enc_secret, &secret, &skey)) {
 		return -1;
 	}
+	pw_tdb_free(&enc_secret);
 	if(pw_encode(key2, secret, &enc_secret, skey)) {
 		return -1;
 	}
